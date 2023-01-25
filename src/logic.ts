@@ -5,9 +5,9 @@ import { IlistName, IlistNameRequest } from "./interfaces";
 export const createList = (request: Request, response: Response): Response => {
   const listData: IlistNameRequest = request.body;
 
-  let inicialId: number = 0;
+  let inicialId: number = 1;
 
-  let id: number = (inicialId += 1);
+  let id: number = (inicialId += ids.length);
 
   const idExists = ids.find((element) => element === id);
 
