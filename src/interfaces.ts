@@ -1,9 +1,16 @@
 export interface IlistNameRequest {
+  listName: string;
+  data: Array<IlistFiels>;
+}
+
+interface IlistFiels {
   name: string;
   quantity: string;
 }
 
 export interface IlistName extends IlistNameRequest {
   id: number;
-  listName: string;
 }
+
+export type listNameRequestKeys = "name" | "quantity";
+export type listFielsKeys = "listName" | "data";

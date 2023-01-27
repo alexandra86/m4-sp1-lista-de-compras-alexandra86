@@ -1,5 +1,5 @@
-import { IlistNameRequest } from "./interfaces";
+import { IlistName } from "./interfaces";
 
-export const data: Array<IlistNameRequest> = [];
+export const data: Array<IlistName> = [];
 
 export const ids: Array<number> = [];
