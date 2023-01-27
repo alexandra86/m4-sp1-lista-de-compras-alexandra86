@@ -31,7 +31,6 @@ const validateDataList = (payload: any): IlistNameRequest => {
   });
 
   keysData.forEach((key: string) => {
-    console.log(key);
     if (!requiredKeysData.includes(key as listNameRequestKeys)) {
       delete payload.data[key];
     }
