@@ -24,6 +24,19 @@ const validateDataList = (payload: any): IlistNameRequest => {
     }
   );
 
+  keys.forEach((key: string) => {
+    if (!requiredKeys.includes(key as listFielsKeys)) {
+      delete payload[key];
+    }
+  });
+
+  keysData.forEach((key: string) => {
+    console.log(key);
+    if (!requiredKeysData.includes(key as listNameRequestKeys)) {
+      delete payload.data[key];
+    }
+  });
+
   if (!allRequiredFields) {
     throw new Error(`Required keys are: ${requiredKeys}`);
   }
