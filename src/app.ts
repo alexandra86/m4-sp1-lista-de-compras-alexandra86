@@ -4,7 +4,8 @@ import {
   searchList,
   retrieveList,
   deleteList,
-  updateList,
+  updateItem,
+  deleteItem,
 } from "./logic";
 import { ensureListExists } from "./middlewares";
 
@@ -19,7 +20,9 @@ app.get("/purchaseList/:id", ensureListExists, retrieveList);
 
 app.delete("/purchaseList/:id", ensureListExists, deleteList);
 
-app.patch("/purchaseList/:id", ensureListExists, updateList);
+app.delete("/purchaseList/:id/:itemName", ensureListExists, deleteItem);
+
+app.patch("/purchaseList/:id/:itemName", ensureListExists, updateItem);
 
 app.listen(3000, () => {
   console.log("Server is running!");

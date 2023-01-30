@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import { data, ids } from "./database";
 import {
+  IlistFiels,
   IlistName,
   IlistNameRequest,
   listFielsKeys,
@@ -8,31 +9,28 @@ import {
 } from "./interfaces";
 
 const validateDataList = (payload: any): IlistNameRequest => {
+  if (typeof payload.listName !== "string") {
+    throw new Error(`message: The list name need to be a string`);
+  }
+
   const keys: Array<string> = Object.keys(payload);
-  const keysData = payload.data.map((el: any) => Object.keys(el));
 
   const requiredKeys: Array<listFielsKeys> = ["listName", "data"];
   const requiredKeysData: Array<listNameRequestKeys> = ["name", "quantity"];
+
+  if (keys.length !== 2) {
+    throw new Error(`Required keys are: ${requiredKeys}`);
+  }
 
   const allRequiredFields: boolean = requiredKeys.every((key: string) => {
     return keys.includes(key);
   });
 
-  const allRequiredFieldsData: boolean = requiredKeysData.every(
-    (key: string) => {
-      return keysData[0].includes(key);
-    }
-  );
-
   keys.forEach((key: string) => {
     if (!requiredKeys.includes(key as listFielsKeys)) {
-      delete payload[key];
-    }
-  });
-
-  keysData.forEach((key: string) => {
-    if (!requiredKeysData.includes(key as listNameRequestKeys)) {
-      delete payload.data[key];
+      return response.status(400).json({
+        message: `Required fields are: ${requiredKeys}`,
+      });
     }
   });
 
@@ -40,8 +38,56 @@ const validateDataList = (payload: any): IlistNameRequest => {
     throw new Error(`Required keys are: ${requiredKeys}`);
   }
 
-  if (!allRequiredFieldsData) {
-    throw new Error(`Required keys are: ${requiredKeysData}`);
+  payload.data.forEach((el: any) => {
+    const dataKeys = Object.keys(el);
+    if (dataKeys.length !== 2) {
+      throw new Error(`Required keys are: ${requiredKeysData}`);
+    }
+    const allRequiredFieldsData: boolean = requiredKeysData.every(
+      (key: string) => {
+        return dataKeys.includes(key);
+      }
+    );
+
+    if (!allRequiredFieldsData) {
+      throw new Error(`Required keys are: ${requiredKeysData}`);
+    }
+  });
+
+  return payload;
+};
+
+const validateUpdateItem = (payload: any): IlistFiels => {
+  if (
+    typeof payload.quantity !== "string" ||
+    typeof payload.name !== "string"
+  ) {
+    throw new Error(`message: The list name need to be a string`);
+  }
+
+  const keys: Array<string> = Object.keys(payload);
+
+  const requiredKeys: Array<listNameRequestKeys> = ["name", "quantity"];
+
+  if (keys.length === 1) {
+    const allRequiredFields: boolean = requiredKeys.some((key: string) => {
+      return keys.includes(key);
+    });
+    if (!allRequiredFields) {
+      throw new Error(`Required keys are: ${requiredKeys}`);
+    }
+  }
+  if (keys.length === 2) {
+    const allRequiredFields: boolean = requiredKeys.every((key: string) => {
+      return keys.includes(key);
+    });
+
+    if (!allRequiredFields) {
+      throw new Error(`Required keys are: ${requiredKeys}`);
+    }
+  }
+  if (keys.length > 2) {
+    throw new Error(`Required keys are: ${requiredKeys}`);
   }
 
   return payload;
@@ -103,10 +149,49 @@ export const deleteList = (request: Request, response: Response): Response => {
   return response.status(204).send();
 };
 
-export const updateList = (request: Request, response: Response): Response => {
+export const deleteItem = (request: Request, response: Response): Response => {
   const indexList: number = request.purchaseList.indexList;
+  const nameItem = request.params.itemName;
 
-  data[indexList] = { ...data[indexList], ...request.body };
+  const itens = data[indexList].data;
+  let item = itens.find((item) => item.name === nameItem);
+  if (!item) {
+    return response.status(404).json({
+      message: `Item with name ${nameItem} does not exist`,
+    });
+  }
+  const positionItem = itens.indexOf(item);
+  itens.splice(positionItem, 1);
 
-  return response.json(data[indexList]);
+  return response.json();
+};
+
+export const updateItem = (request: Request, response: Response): Response => {
+  try {
+    const indexList: number = request.purchaseList.indexList;
+    const nameItem = request.params.itemName;
+
+    const itens = data[indexList].data;
+    let item = itens.find((item) => item.name === nameItem);
+
+    if (!item) {
+      return response.status(404).json({
+        message: `Item with name ${nameItem} does not exist`,
+      });
+    }
+    const listData: IlistFiels = validateUpdateItem(request.body);
+    const positionItem = itens.indexOf(item);
+    itens[positionItem] = listData;
+    return response.status(200).json(itens[positionItem]);
+  } catch (error) {
+    if (error instanceof Error) {
+      return response.status(400).json({
+        message: error.message,
+      });
+    }
+    console.log(error);
+    return response.status(500).json({
+      message: "Internal server error",
+    });
+  }
 };

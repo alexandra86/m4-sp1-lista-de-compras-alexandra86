@@ -3,7 +3,7 @@ export interface IlistNameRequest {
   data: Array<IlistFiels>;
 }
 
-interface IlistFiels {
+export interface IlistFiels {
   name: string;
   quantity: string;
 }
