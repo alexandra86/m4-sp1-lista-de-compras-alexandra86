@@ -10,7 +10,7 @@ import {
 
 const validateDataList = (payload: any): IlistNameRequest => {
   if (typeof payload.listName !== "string") {
-    throw new Error(`message: The list name need to be a string`);
+    throw new Error("The list name need to be a string");
   }
 
   const keys: Array<string> = Object.keys(payload);
@@ -58,13 +58,6 @@ const validateDataList = (payload: any): IlistNameRequest => {
 };
 
 const validateUpdateItem = (payload: any): IlistFiels => {
-  if (
-    typeof payload.quantity !== "string" ||
-    typeof payload.name !== "string"
-  ) {
-    throw new Error(`message: The list name need to be a string`);
-  }
-
   const keys: Array<string> = Object.keys(payload);
 
   const requiredKeys: Array<listNameRequestKeys> = ["name", "quantity"];
@@ -88,6 +81,13 @@ const validateUpdateItem = (payload: any): IlistFiels => {
   }
   if (keys.length > 2) {
     throw new Error(`Required keys are: ${requiredKeys}`);
+  }
+
+  if (
+    typeof payload.quantity !== "string" ||
+    typeof payload.name !== "string"
+  ) {
+    throw new Error("The list name need to be a string");
   }
 
   return payload;
