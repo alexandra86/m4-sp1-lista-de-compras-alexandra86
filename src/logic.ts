@@ -163,7 +163,7 @@ export const deleteItem = (request: Request, response: Response): Response => {
   const positionItem = itens.indexOf(item);
   itens.splice(positionItem, 1);
 
-  return response.json();
+  return response.status(204).send();
 };
 
 export const updateItem = (request: Request, response: Response): Response => {
